@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { version } from "@/../package.json";
 import { GalleryVerticalEnd } from "lucide-react";
 import { LoginForm } from "./LoginForm";
@@ -6,17 +5,38 @@ import { RegisterForm } from "./RegisterForm";
 import { ForgotPassword } from "./ForgotPassword";
 import { VerifyOtp } from "./VerifyOtp";
 import { WorkShopName } from "./WorkShopName";
-import { useAuth } from "@/context/AuthContext"; // useAuth from context
+import { PaymentForm } from "./PaymentForm";
+import { PricingPlanes } from "./PricingPlanes";
+import { useAuth } from "@/context/AuthContext";
 
 export default function AuthLayout({ title = "Acme Inc." }) {
-    // Use context instead of Redux
-    const { step, setStep } = useAuth();
-    const [email, setEmail] = useState("");
+    const { step } = useAuth();
+
+    const renderStep = () => {
+        switch (step) {
+            case "login":
+                return <LoginForm />;
+            case "register":
+                return <RegisterForm />;
+            case "forgot-password":
+                return <ForgotPassword />;
+            case "verifyOtp":
+                return <VerifyOtp />;
+            case "createOrg":
+                return <WorkShopName />;
+            case "pricingPlanes":
+                return <PricingPlanes />;
+            case "payment":
+                return <PaymentForm />;
+            default:
+                return <LoginForm />;
+        }
+    };
 
     return (
         <div className="grid min-h-svh lg:grid-cols-2">
-            {/* Left side with logo + form */}
-            <div className="flex flex-col gap-4 p-10">
+            {/* Left side: Logo + Form */}
+            <div className="flex flex-col gap-4 py-6 px-8">
                 {/* Logo */}
                 <div className="flex justify-center gap-2 md:justify-start">
                     <a href="#" className="flex items-center gap-2 font-medium">
@@ -27,26 +47,22 @@ export default function AuthLayout({ title = "Acme Inc." }) {
                     </a>
                 </div>
 
-                {/* Form section */}
+                {/* Form */}
                 <div className="flex flex-1 items-center justify-center">
-                    <div className="w-full max-w-sm">
-                        {step === "login" && <LoginForm setStep={setStep} />}
-                        {step === "register" && <RegisterForm setStep={setStep} setEmail={setEmail} />}
-                        {step === "forgot-password" && <ForgotPassword setStep={setStep} />}
-                        {step === "verifyOtp" && <VerifyOtp setStep={setStep} otpEmail={email} />}
-                        {step === "createOrg" && <WorkShopName setStep={setStep} />}
+                    <div className="w-full max-w-2xl mx-auto">
+                        {renderStep()}
                     </div>
                 </div>
             </div>
 
-            {/* Right side image + content */}
+            {/* Right side: Illustration + content */}
             <div className="relative flex flex-col items-center justify-center bg-gradient-to-br from-blue-950 to-[#009896] text-white p-8 lg:p-12">
                 <div className="max-w-lg space-y-4 z-10">
                     <h1 className="text-3xl lg:text-4xl font-extrabold leading-tight">
                         CRM Applications: Real-time Engagement on a Unified Platform
                     </h1>
                     <p className="text-blue-100 text-sm lg:text-base leading-relaxed">
-                        Delight360 is the ultimate all-in-one super app for businesses — streamlining HR, recruitment, tasks, goals, sales, marketing, appraisal, and finance. Say goodbye to multiple platforms and enjoy convenience in one place.
+                        Delight360 is the ultimate all-in-one super app for businesses — streamline HR, recruitment, tasks, goals, sales, marketing, appraisal, and finance. Say goodbye to multiple platforms and enjoy convenience in one place.
                     </p>
                 </div>
 

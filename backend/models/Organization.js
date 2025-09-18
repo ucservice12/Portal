@@ -75,19 +75,19 @@ const OrganizationSchema = new mongoose.Schema({
     endDate: Date,
     features: {
       maxUsers: { type: Number, default: 5 },
-      maxStorage: { type: Number, default: 1 }, // GB
+      maxStorage: { type: Number, default: 1 },
       modules: {
-        crm: { type: Boolean, default: true },
+        admin: { type: Boolean, default: true },
         projects: { type: Boolean, default: false },
         hr: { type: Boolean, default: false },
-        invoicing: { type: Boolean, default: false },
-        reports: { type: Boolean, default: false },
-        api: { type: Boolean, default: false }
+        sales: { type: Boolean, default: false },
+        finance: { type: Boolean, default: false },
+        employee: { type: Boolean, default: false }
       }
     }
   },
   settings: {
-    currency: { type: String, default: 'USD' },
+    currency: { type: String, default: 'INR' },
     dateFormat: { type: String, default: 'MM/DD/YYYY' },
     timeFormat: { type: String, default: '12' },
     timezone: { type: String, default: 'UTC' },

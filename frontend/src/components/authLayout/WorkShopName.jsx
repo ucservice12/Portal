@@ -1,29 +1,53 @@
 import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/context/AuthContext"; // step from auth
-import { useOrganization } from "@/context/OrganizationContext"; // org context
+import { useAuth } from "@/context/AuthContext";
+import { useOrganization } from "@/context/OrganizationContext";
+import { createOrganization as createOrgApi } from "@/api/organization";
 
 export function WorkShopName() {
-    const { setStep, user } = useAuth();
-    const { createOrganization, loading, error } = useOrganization();
-    const [org, setOrg] = useState("");
+    const { user, setStep } = useAuth();
+    const { organizations, setOrganizations, loading, setLoading, error, setError } = useOrganization();
 
-    console.log("User in WorkShopName:", user);
+    const [org, setOrg] = useState("");
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!org.trim()) return; // minimal check
+
+        // Frontend validation
+        if (!org.trim()) {
+            setError("Organization name is required");
+            return;
+        }
+
+        setLoading(true);
+        setError("");
 
         try {
-            await createOrganization({
-                organizationName: org,
-                userData: { name: user.name, email: user.email },
-            });
-            // Move to next step
-            setStep("dashboard");
+            // Call backend API
+            const response = await createOrgApi(org.trim(), user);
+
+            console.log("Workspace Created:", response.data);
+
+            if (response.status === 200) {
+                localStorage.removeItem("cognitoIdentity");
+                localStorage.setItem("cognitoIdentityToken", JSON.stringify(res.data.token));
+                setStep("pricingPlanes");
+            }
+
         } catch (err) {
-            console.log("Failed to create organization", err);
+            console.error("Error creating organization:", err);
+
+            // Robust backend error handling
+            const backendError =
+                err.response?.data?.error ||
+                err.response?.data?.message ||
+                err.message ||
+                "Failed to create organization";
+
+            setError(backendError);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -38,17 +62,15 @@ export function WorkShopName() {
                     <Input
                         id="organizationName"
                         type="text"
-                        placeholder="Workspace Name"
                         value={org}
                         onChange={(e) => setOrg(e.target.value)}
                     />
                     <small className="text-xs leading-none font-medium">
                         - Try the name of your company or organization.
                     </small>
-
-                    {/* Error from context */}
-                    {error && <span className="text-red-500 text-xs">{error}</span>}
                 </div>
+
+                {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
 
                 <Button className="w-full mt-4" type="submit" disabled={loading}>
                     {loading ? "Creating..." : "Continue"}

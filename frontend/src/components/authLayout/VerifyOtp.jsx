@@ -1,67 +1,75 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
+import { verifyEmailOtp } from "@/api/auth";
 
-export function VerifyOtp({ otpEmail }) {
-    const { verifyOtp, setStep, loading, error } = useAuth();
+export function VerifyOtp() {
+    const { otpEmail, loading, setLoading, setStep, user } = useAuth();
 
     const [otp, setOtp] = useState(Array(6).fill(""));
-    const inputs = [];
+    const [error, setError] = useState("");
 
-    // Handle OTP input change
+    // Refs for all inputs
+    const inputRefs = useRef([]);
+
     const handleChange = (idx, val) => {
-        if (!/^[0-9]?$/.test(val)) return; // allow only digits
+        if (!/^[0-9]?$/.test(val)) return;
+
         const newOtp = [...otp];
         newOtp[idx] = val;
         setOtp(newOtp);
 
-        // Auto focus next input
-        if (val && idx < 5 && inputs[idx + 1]) {
-            inputs[idx + 1].focus();
-        }
+        if (val && idx < 5) inputRefs.current[idx + 1]?.focus();
     };
 
-    // Handle backspace
     const handleKeyDown = (idx, e) => {
         if (e.key === "Backspace" && !otp[idx] && idx > 0) {
-            inputs[idx - 1].focus();
+            inputRefs.current[idx - 1]?.focus();
         }
     };
 
-    // Submit OTP
-    const handleVerify = async (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         const otpCode = otp.join("");
 
-        if (otpCode.length !== 6) {
-            alert("Enter 6 digit code");
+        if (otpCode.length < 6) {
+            setError("Please enter the full 6-digit code.");
             return;
         }
 
-        if (!otpEmail) {
-            alert("Email is missing");
-            return;
-        }
+        setError("");
+        setLoading(true);
 
         try {
-            await verifyOtp({ email: otpEmail, otp: otpCode });
-            // success handling (step change) can be done in context if needed
+            const res = await verifyEmailOtp(otpCode, otpEmail);
+
+            if (res.status === 200) {
+                // Convert user object to base64 (JWT-like)
+                const encodedUser = btoa(JSON.stringify(user));
+                localStorage.setItem("cognitoIdentity", encodedUser);
+
+                setStep("createOrg");
+            } else {
+                setStep("register");
+            }
         } catch (err) {
-            console.log("OTP verification failed", err);
+            setError(err?.message || "Failed to verify OTP");
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
         <form
             className="w-full max-w-sm lg:mt-20 mx-auto flex flex-col items-center space-y-6"
-            onSubmit={handleVerify}
+            onSubmit={handleSubmit}
         >
             <div className="text-4xl text-blue-500">📩</div>
             <h2 className="sm:text-3xl text-2xl font-semibold tracking-tight mb-1">
                 Verify your Email
             </h2>
-            <p className="text-muted-foreground text-sm mb-4">
+            <p className="text-muted-foreground text-sm mb-4 text-center">
                 We have sent a verification code to your email
                 <br />
                 <span className="font-semibold">{otpEmail}</span>
@@ -74,17 +82,16 @@ export function VerifyOtp({ otpEmail }) {
                         key={idx}
                         type="text"
                         maxLength={1}
-                        className="sm:w-10 w-9 sm:h-10 h-9 text-center border rounded-md text-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="sm:w-10 w-9 sm:h-10 h-9 text-center border rounded-md text-xl"
                         value={digit}
                         onChange={(e) => handleChange(idx, e.target.value)}
                         onKeyDown={(e) => handleKeyDown(idx, e)}
-                        ref={(el) => (inputs[idx] = el)}
+                        ref={(el) => (inputRefs.current[idx] = el)}
                     />
                 ))}
             </div>
 
-            {/* Error */}
-            {error && <span className="text-red-500 text-xs">{error}</span>}
+            {error && <p className="text-red-500 text-sm">{error}</p>}
 
             {/* Verify Button */}
             <Button
@@ -97,14 +104,14 @@ export function VerifyOtp({ otpEmail }) {
 
             {/* Actions */}
             <div className="grid grid-cols-2 gap-4 w-full">
-                <Button type="button" onClick={() => setOtp(Array(6).fill(""))}>
+                <Button type="button" onClick={() => console.log("Resend OTP")}>
                     Resend
                 </Button>
                 <Button
                     variant="secondary"
                     className="w-full"
                     type="button"
-                    onClick={() => setStep("login")} // ✅ use context
+                    onClick={() => console.log("Cancel")}
                 >
                     Cancel
                 </Button>

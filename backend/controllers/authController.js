@@ -28,7 +28,7 @@ exports.register = async (req, res) => {
     if (existingUser) {
       return res.status(409).json({
         success: false,
-        error: "User already exists",
+        error: "User already exists Please Login",
       });
     }
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
@@ -91,8 +91,9 @@ exports.register = async (req, res) => {
     });
   }
 };
-// routes/verifyOtp.js
 
+
+// routes/verifyOtp.js
 exports.verifyOtp = (req, res) => {
   try {
     const { email, otp } = req.body;

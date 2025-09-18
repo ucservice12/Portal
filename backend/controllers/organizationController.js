@@ -1,35 +1,57 @@
 const Organization = require("../models/Organization");
+const User = require("../models/User");
+const jwt = require("jsonwebtoken");
+
+// Secret for JWT signing
+const JWT_SECRET = process.env.JWT_SECRET;
+const JWT_EXPIRES_IN = process.env.JWT_EXPIRE || "1h";
 
 // @desc    Create new organization
 // @route   POST /api/v1/organizations
 // @access  Private/Admin
-const User = require('../models/User');
 exports.createOrganization = async (req, res) => {
   try {
     const { organizationName, userData } = req.body;
 
-    if (!organizationName || !userData) {
-      return res.status(400).json({ success: false, error: "Missing organization name or user data" });
+    if (!organizationName) {
+      return res.status(400).json({ success: false, error: "Missing organization name" });
     }
 
+    if (!userData) {
+      return res.status(400).json({ success: false, error: "Missing user data" });
+    }
+
+    // Create user
     const user = await User.create(userData);
 
     try {
+      // Create organization
       const organization = await Organization.create({
         name: organizationName,
         createdBy: user._id,
       });
 
+      // Link organization to user
       user.organization = organization._id;
       await user.save();
 
-      return res.status(201).json({
-        success: true,
-        message: "User and Organization created successfully",
+      // --- Create JWT token ---
+      const payload = {
         userId: user._id,
+        email: user.email,
         organizationId: organization._id,
+      };
+
+      const token = jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
+
+      return res.status(201).json({
+        message: "User and Organization created successfully",
+        userEmail: user.email,
+        organizationId: organization._id,
+        token,
       });
     } catch (orgError) {
+      // Rollback user if org creation fails
       await User.deleteOne({ _id: user._id });
 
       return res.status(500).json({
@@ -39,7 +61,7 @@ exports.createOrganization = async (req, res) => {
       });
     }
   } catch (err) {
-    console.log(err)
+    console.log(err);
     return res.status(500).json({
       success: false,
       error: "Error creating user or organization",

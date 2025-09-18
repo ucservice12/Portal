@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,16 +6,10 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/AuthContext";
+import { register as registerApi } from "@/api/auth";
 
-// --- Validation helpers
-const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-const validatePassword = (password) =>
-  /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(
-    password
-  );
-
-export function RegisterForm({ className, setEmail }) {
-  const { registerUser, setUser, setStep, loading, error, isAuthenticated } = useAuth();
+export function RegisterForm() {
+  const { setStep, setOtpEmail, loading, setLoading, setUser } = useAuth();
 
   const [values, setValues] = useState({
     firstName: "",
@@ -24,59 +18,126 @@ export function RegisterForm({ className, setEmail }) {
     confPassword: "",
     terms: false,
   });
+
+  const [errors, setErrors] = useState({
+    firstName: "",
+    email: "",
+    password: "",
+    confPassword: "",
+    terms: "",
+    general: "",
+  });
+
   const [showPass, setShowPass] = useState(false);
   const [showConf, setShowConf] = useState(false);
-  const [errors, setErrors] = useState({});
 
-  // Redirect to OTP step after registration success
-  useEffect(() => {
-    if (isAuthenticated) setStep("verifyOtp");
-  }, [isAuthenticated, setStep]);
-
-  function handleChange(e) {
+  const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setValues((v) => ({ ...v, [name]: type === "checkbox" ? checked : value }));
-    setErrors((prev) => ({ ...prev, [name]: undefined }));
-  }
+    setErrors((prev) => ({ ...prev, [name]: "", general: "" }));
+  };
 
-  function validate(v) {
-    const e = {};
-    if (!v.firstName.trim()) e.firstName = "First name is required";
-    if (!v.email.trim()) e.email = "Email is required";
-    else if (!validateEmail(v.email)) e.email = "Invalid email format";
-    if (!v.password) e.password = "Password is required";
-    else if (!validatePassword(v.password))
-      e.password =
-        "Password must be 8+ chars and include uppercase, lowercase, number, and special character";
-    if (!v.confPassword) e.confPassword = "Confirm password is required";
-    else if (v.password !== v.confPassword)
-      e.confPassword = "Passwords do not match";
-    if (!v.terms) e.terms = "You must accept the terms and conditions";
-    return e;
-  }
-
-  async function handleSubmit(e) {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const errs = validate(values);
-    setErrors(errs);
-    if (Object.keys(errs).length > 0) return;
 
+    // --- Frontend Validation ---
+    let hasError = false;
+    let newErrors = {
+      firstName: "",
+      email: "",
+      password: "",
+      confPassword: "",
+      terms: "",
+      general: "",
+    };
+
+    if (!values.firstName.trim()) {
+      newErrors.firstName = "First name is required";
+      hasError = true;
+    }
+
+    if (!values.email.trim()) {
+      newErrors.email = "Email is required";
+      hasError = true;
+    } else {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(values.email)) {
+        newErrors.email = "Invalid email format";
+        hasError = true;
+      }
+    }
+
+    const strongPasswordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
+    if (!values.password) {
+      newErrors.password = "Password is required";
+      hasError = true;
+    } else if (!strongPasswordRegex.test(values.password)) {
+      newErrors.password =
+        "Password must include uppercase, lowercase, number, and special char (min 8)";
+      hasError = true;
+    }
+
+    if (!values.confPassword) {
+      newErrors.confPassword = "Confirm your password";
+      hasError = true;
+    } else if (values.password !== values.confPassword) {
+      newErrors.confPassword = "Passwords do not match";
+      hasError = true;
+    }
+
+    if (!values.terms) {
+      newErrors.terms = "You must accept terms";
+      hasError = true;
+    }
+
+    if (hasError) {
+      setErrors(newErrors);
+      return;
+    }
+
+    // --- Backend Submission ---
+    setLoading(true);
     try {
-      await registerUser({
-        name: values.firstName,
-        email: values.email,
+      // call your register API
+      const res = await registerApi({
+        firstName: values.firstName.trim(),
+        email: values.email.trim(),
         password: values.password,
       });
-      setEmail(values.email); // Pass email to parent for OTP
-      setUser(values);
+
+      setUser({
+        firstName: values.firstName.trim(),
+        email: values.email.trim(),
+        password: values.password,
+        role: "admin",
+      });
+
+      // Move to OTP verification step
+      setOtpEmail(values.email.trim());
+      setStep("verifyOtp");
+
     } catch (err) {
-      console.log("Registration failed", err);
+      let backendMsg = "Registration failed";
+
+      if (err?.response?.status === 409) {
+        // Conflict: email already exists
+        backendMsg = "Email already registered. Please login or use another email.";
+      } else {
+        backendMsg = err?.response?.data?.message || err?.message || backendMsg;
+      }
+
+      setErrors({ ...newErrors, general: backendMsg });
+    } finally {
+      setLoading(false);
     }
-  }
+  };
+
 
   return (
     <form
-      className={cn("flex flex-col gap-6 w-full max-w-sm mx-auto", className)}
+      className={cn("flex flex-col gap-6 w-full max-w-sm mx-auto")}
       onSubmit={handleSubmit}
     >
       <h1 className="text-2xl text-center font-bold">Create a new account</h1>
@@ -92,7 +153,7 @@ export function RegisterForm({ className, setEmail }) {
             onChange={handleChange}
           />
           {errors.firstName && (
-            <span className="text-red-500 text-xs">{errors.firstName}</span>
+            <p className="text-red-500 text-sm">{errors.firstName}</p>
           )}
         </div>
 
@@ -107,7 +168,7 @@ export function RegisterForm({ className, setEmail }) {
             onChange={handleChange}
           />
           {errors.email && (
-            <span className="text-red-500 text-xs">{errors.email}</span>
+            <p className="text-red-500 text-sm">{errors.email}</p>
           )}
         </div>
 
@@ -130,11 +191,8 @@ export function RegisterForm({ className, setEmail }) {
             {showPass ? <EyeOff size={18} /> : <Eye size={18} />}
           </button>
           {errors.password && (
-            <span className="text-red-500 text-xs">{errors.password}</span>
+            <p className="text-red-500 text-sm">{errors.password}</p>
           )}
-          <span className="text-xs text-muted-foreground mt-1">
-            Must include uppercase, lowercase, number & special character.
-          </span>
         </div>
 
         {/* Confirm Password */}
@@ -156,7 +214,7 @@ export function RegisterForm({ className, setEmail }) {
             {showConf ? <EyeOff size={18} /> : <Eye size={18} />}
           </button>
           {errors.confPassword && (
-            <span className="text-red-500 text-xs">{errors.confPassword}</span>
+            <p className="text-red-500 text-sm">{errors.confPassword}</p>
           )}
         </div>
 
@@ -173,11 +231,13 @@ export function RegisterForm({ className, setEmail }) {
           <Label htmlFor="terms">Accept terms and conditions</Label>
         </div>
         {errors.terms && (
-          <span className="text-red-500 text-xs">{errors.terms}</span>
+          <p className="text-red-500 text-sm">{errors.terms}</p>
         )}
 
-        {/* Backend/API Error */}
-        {error && <span className="text-red-500 text-xs">{error}</span>}
+        {/* General Error */}
+        {errors.general && (
+          <p className="text-red-500 text-sm">{errors.general}</p>
+        )}
 
         {/* Submit */}
         <Button type="submit" className="w-full" disabled={loading}>
@@ -185,12 +245,13 @@ export function RegisterForm({ className, setEmail }) {
         </Button>
       </div>
 
+      {/* Switch to login */}
       <div className="text-center text-sm">
         Already have an account?{" "}
         <button
           type="button"
-          onClick={() => setStep("login")}
           className="underline underline-offset-4 font-semibold cursor-pointer"
+          onClick={() => setStep("login")}
         >
           Login
         </button>

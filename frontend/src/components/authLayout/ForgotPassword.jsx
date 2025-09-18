@@ -2,12 +2,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/context/AuthContext";
 
-export function ForgotPassword({ setStep, className, ...props }) {
+export function ForgotPassword() {
+    const { setStep } = useAuth();
+
     return (
         <form
-            className={cn("flex flex-col gap-6 lg:mt-22 w-full max-w-sm mx-auto", className)}
-            {...props}
+            className={cn("flex flex-col gap-6 lg:mt-22 w-full max-w-sm mx-auto")}
         >
             <div className="flex flex-col gap-2">
                 <h1 className="text-2xl font-bold">Forgot Password</h1>
@@ -28,7 +30,7 @@ export function ForgotPassword({ setStep, className, ...props }) {
             </div>
 
             <div className="text-center text-sm">
-                If you already have an account?{" "}
+                If you already know password?{" "}
                 <button onClick={() => setStep("login")} className="text-link font-semibold cursor-pointer">
                     Sign In
                 </button>
