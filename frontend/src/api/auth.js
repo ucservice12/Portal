@@ -1,52 +1,53 @@
 import { customAxios } from "@/services/customAxios";
 
-// Register new user
+// ================== AUTH API SERVICES ==================
+
+// Register new user (Step 1: Send OTP, Step 2: Verify + Create User)
 export function register(data) {
-    return customAxios.post("/auth/register", data);
+  // data: { email } OR { email, otp, firstName, password }
+  return customAxios.post("/auth/register", data);
 }
 
 // User login
 export function login(data) {
-    return customAxios.post("/auth/login", data);
-}
-
-// Verify email OTP
-export function verifyEmailOtp(otp, email) {
-    return customAxios.post("/auth/verify-otp", { otp, email });
+  // data: { email, password }
+  return customAxios.post("/auth/login", data);
 }
 
 // Get current user
 export function getMe() {
-    console.log("GetMe called");
-    // return customAxios.get("/auth/me");
+  return customAxios.get("/auth/me");
 }
 
 // Update user details
 export function updateDetails(data) {
-    console.log("Update details called with:", data);
-    // return customAxios.put("/auth/updatedetails", data);
+  return customAxios.put("/auth/updatedetails", data);
 }
 
-// Update password
+// Update password (when logged in)
 export function updatePassword(data) {
-    console.log("Update password called with:", data);
-    // return customAxios.put("/auth/updatepassword", data);
+  // data: { currentPassword, newPassword }
+  return customAxios.put("/auth/updatepassword", data);
 }
 
-// Forgot password
+// ================== PASSWORD RESET FLOW ==================
+
+// Step 1: Forgot password (send OTP)
 export function forgotPassword(email) {
-    console.log("Forgot password called with:", email);
-    // return customAxios.post("/auth/forgotpassword", { email });
+  return customAxios.post("/auth/forgotpassword", { email });
 }
 
-// Reset password
-export function resetPassword(token, password) {
-    console.log("Reset password called with:", { token, password });
-    // return customAxios.put(`/auth/resetpassword/${token}`, { password });
+// Step 2: Verify OTP
+export function verifyForgotOtp(email, otp) {
+  return customAxios.post("/auth/verifyforgototp", { email, otp });
 }
 
-// Logout user
-export function logout() {
-    console.log("Logout called");
-    // return customAxios.get("/auth/logout");
+// Step 3: Reset password (after OTP verified)
+export function resetPassword(email, password) {
+  return customAxios.post("/auth/resetpassword", { email, password });
+}
+
+// ================== LOGOUT ==================
+export function logoutApi() {
+  return customAxios.get("/auth/logout");
 }

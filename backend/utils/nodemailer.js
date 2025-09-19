@@ -13,7 +13,7 @@ const transporter = nodemailer.createTransport({
 
 const sendEmail = async ({ to, subject, text, html }) => {
     return transporter.sendMail({
-        from: "Delight360 ",
+        from: process.env.SMTP_FROM,
         to,
         subject,
         text,

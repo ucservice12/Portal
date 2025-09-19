@@ -75,19 +75,19 @@ const OrganizationSchema = new mongoose.Schema({
     endDate: Date,
     features: {
       maxUsers: { type: Number, default: 5 },
-      maxStorage: { type: Number, default: 1 },
+      maxStorage: { type: Number, default: 1 }, // GB
       modules: {
-        admin: { type: Boolean, default: true },
+        crm: { type: Boolean, default: true },
         projects: { type: Boolean, default: false },
         hr: { type: Boolean, default: false },
-        sales: { type: Boolean, default: false },
-        finance: { type: Boolean, default: false },
-        employee: { type: Boolean, default: false }
+        invoicing: { type: Boolean, default: false },
+        reports: { type: Boolean, default: false },
+        api: { type: Boolean, default: false }
       }
     }
   },
   settings: {
-    currency: { type: String, default: 'INR' },
+    currency: { type: String, default: 'USD' },
     dateFormat: { type: String, default: 'MM/DD/YYYY' },
     timeFormat: { type: String, default: '12' },
     timezone: { type: String, default: 'UTC' },
@@ -134,6 +134,31 @@ OrganizationSchema.pre('save', function (next) {
   }
   next();
 });
+
+// 👉 Auto set trial/free expiry (1 day)
+OrganizationSchema.pre('save', function (next) {
+  if (this.isModified('subscription.plan') || this.isNew) {
+    if (this.subscription.plan === 'free' || this.subscription.status === 'trial') {
+      const expiryDate = new Date(this.subscription.startDate || Date.now());
+      expiryDate.setDate(expiryDate.getDate() + 1);
+      this.subscription.endDate = expiryDate;
+    } else {
+      this.subscription.endDate = null;
+    }
+  }
+  next();
+});
+
+// 👉 Check if expired
+OrganizationSchema.methods.isExpired = function () {
+  if (
+    (this.subscription.plan === 'free' || this.subscription.status === 'trial') &&
+    this.subscription.endDate
+  ) {
+    return new Date() > new Date(this.subscription.endDate);
+  }
+  return false;
+};
 
 // Reverse populate with virtuals
 OrganizationSchema.virtual('users', {

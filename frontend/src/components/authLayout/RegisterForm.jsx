@@ -9,7 +9,7 @@ import { useAuth } from "@/context/AuthContext";
 import { register as registerApi } from "@/api/auth";
 
 export function RegisterForm() {
-  const { setStep, setOtpEmail, loading, setLoading, setUser } = useAuth();
+  const { setStep, loading, setLoading, setUser } = useAuth();
 
   const [values, setValues] = useState({
     firstName: "",
@@ -100,44 +100,28 @@ export function RegisterForm() {
     // --- Backend Submission ---
     setLoading(true);
     try {
-      // call your register API
-      const res = await registerApi({
-        firstName: values.firstName.trim(),
-        email: values.email.trim(),
-        password: values.password,
-      });
+      // Step 1: request OTP only
+      await registerApi({ email: values.email.trim() });
 
+      // Save draft user in context
       setUser({
         firstName: values.firstName.trim(),
         email: values.email.trim(),
         password: values.password,
-        role: "admin",
       });
 
-      // Move to OTP verification step
-      setOtpEmail(values.email.trim());
       setStep("verifyOtp");
-
     } catch (err) {
-      let backendMsg = "Registration failed";
-
-      if (err?.response?.status === 409) {
-        // Conflict: email already exists
-        backendMsg = "Email already registered. Please login or use another email.";
-      } else {
-        backendMsg = err?.response?.data?.message || err?.message || backendMsg;
-      }
-
-      setErrors({ ...newErrors, general: backendMsg });
+      console.log(err.response.data);
+      setErrors({ ...newErrors, general: err.response.data.error });
     } finally {
       setLoading(false);
     }
   };
 
-
   return (
     <form
-      className={cn("flex flex-col gap-6 w-full max-w-sm mx-auto")}
+      className={cn("flex flex-col md:mt-16 gap-6 w-full max-w-sm mx-auto")}
       onSubmit={handleSubmit}
     >
       <h1 className="text-2xl text-center font-bold">Create a new account</h1>
@@ -241,7 +225,7 @@ export function RegisterForm() {
 
         {/* Submit */}
         <Button type="submit" className="w-full" disabled={loading}>
-          {loading ? "Creating..." : "Create Account"}
+          {loading ? "Sending OTP..." : "Continue"}
         </Button>
       </div>
 

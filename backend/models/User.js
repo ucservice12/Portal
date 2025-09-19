@@ -10,12 +10,11 @@ const UserSchema = new mongoose.Schema({
     trim: true,
     maxlength: [50, 'First name cannot be more than 50 characters']
   },
-  // lastName: {
-  //   type: String,
-  //   required: [true, 'Please add a last name'],
-  //   trim: true,
-  //   maxlength: [50, 'Last name cannot be more than 50 characters']
-  // },
+  lastName: {
+    type: String,
+    trim: true,
+    maxlength: [50, 'Last name cannot be more than 50 characters']
+  },
   email: {
     type: String,
     required: [true, 'Please add an email'],

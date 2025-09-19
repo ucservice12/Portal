@@ -5,10 +5,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
-import { login as loginApi } from "@/api/auth"; // use your API
+import { login as loginApi } from "@/api/auth";
 
 export function LoginForm() {
-  const { setStep, loading } = useAuth();
+  const { setStep, loading, saveAuth } = useAuth();
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState({ email: "", password: "", general: "" });
   const [showPassword, setShowPassword] = useState(false);
@@ -16,7 +16,7 @@ export function LoginForm() {
   const handleChange = (e) => {
     const { id, value } = e.target;
     setFormData({ ...formData, [id]: value });
-    setErrors({ ...errors, [id]: "", general: "" }); // clear errors on typing
+    setErrors({ ...errors, [id]: "", general: "" });
   };
 
   const handleSubmit = async (e) => {
@@ -49,11 +49,19 @@ export function LoginForm() {
 
     // --- Call backend API ---
     try {
-      await loginApi(formData); // currently logs the data
-      console.log("✅ Login successful:", formData);
+      const res = await loginApi(formData);
+
+      console.log("Login successfull:", res.data);
+
+      const { token } = res.data;
+
+      // Save token + user to localStorage
+      saveAuth(token);
+
+      if (res.data.user.organization ? setStep("dashboard") : setStep("createOrg"));
+
       setErrors({ email: "", password: "", general: "" });
     } catch (err) {
-      // Backend error handling
       const msg = err?.response?.data?.error || err.message || "Login failed";
       setErrors({ ...newErrors, general: msg });
     }
@@ -61,7 +69,7 @@ export function LoginForm() {
 
   return (
     <form
-      className={cn("flex flex-col max-w-sm mx-auto gap-6")}
+      className={cn("flex flex-col md:mt-22 max-w-sm mx-auto gap-6")}
       onSubmit={handleSubmit}
     >
       <h1 className="text-2xl text-center font-bold">Login to your account</h1>

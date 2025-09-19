@@ -1,26 +1,31 @@
 const express = require("express");
 const {
-  register,
+  registerOrVerify,
   login,
   getMe,
   updateDetails,
   updatePassword,
   forgotPassword,
+  verifyForgotOtp,
   resetPassword,
   logout,
-  verifyOtp,
 } = require("../controllers/authController");
 
 const { protect } = require("../middleware/auth");
 
 const router = express.Router();
 
-router.post("/register", register);
+// Public routes
+router.post("/register", registerOrVerify);
 router.post("/login", login);
+
+// Forgot password (OTP flow)
 router.post("/forgotpassword", forgotPassword);
-router.put("/resetpassword/:resettoken", resetPassword);
+router.post("/verifyforgototp", verifyForgotOtp);
+router.put("/resetpassword", resetPassword);
+
+// Logout
 router.get("/logout", logout);
-router.post("/verify-otp", verifyOtp)
 
 // Protected routes
 router.get("/me", protect, getMe);
