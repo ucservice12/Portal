@@ -52,9 +52,7 @@ export default function AuthLayout({ title = "Acme Inc." }) {
           {/* User Info / Logout */}
           <div className="flex flex-col items-end">
             <p className="text-sm capitalize">
-              {user
-                ? `Welcome, ${user.firstName || "User"}`
-                : "Welcome"}
+              {user ? `Welcome, ${user.firstName || "User"}` : "Welcome"}
             </p>
 
             {/* ✅ Show logout only if logged in */}
@@ -100,7 +98,8 @@ export default function AuthLayout({ title = "Acme Inc." }) {
 
         {/* Footer */}
         <p className="text-sm lg:text-base leading-relaxed mt-6 z-10 text-center lg:text-left">
-          Copyright © {new Date().getFullYear()} Delighteck. All rights reserved.
+          Copyright © {new Date().getFullYear()} Delighteck. All rights
+          reserved.
           <br />
           Version: {version}
         </p>

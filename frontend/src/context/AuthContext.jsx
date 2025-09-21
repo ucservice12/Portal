@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import React, { createContext, useContext, useState, useEffect } from "react";
 import Cookies from "js-cookie";
 import { getMe, logoutApi } from "../api/auth";
@@ -5,6 +6,8 @@ import { getMe, logoutApi } from "../api/auth";
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
+    const navigate = useNavigate();
+
     const [step, setStep] = useState("login");
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -25,24 +28,24 @@ export const AuthProvider = ({ children }) => {
 
                 const userData = res.data.data;
 
-                if (userData.status === "inactive") {
-                    logout();
-                    return;
-                }
-
-                if (userData.organization.subscription.status === "inactive") {
-                    logout();
-                    return;
-                }
-
-                if (userData.organization.subscription.isActive === false) {
+                if (
+                    userData.status === "inactive" ||
+                    userData.organization?.subscription?.isActive === false ||
+                    userData.organization?.subscription?.status === "inactive"
+                ) {
                     logout();
                     return;
                 }
 
                 if (res.data.success) {
                     setUser(res.data.data);
-                    setStep(res.data.data.organization ? "dashboard" : "createOrg");
+
+                    if (userData.organization) {
+                        navigate("/dashboard", { replace: true });
+                    } else {
+                        setStep("createOrg");
+                    }
+
                 } else {
                     logout();
                 }
@@ -55,13 +58,15 @@ export const AuthProvider = ({ children }) => {
         };
 
         initAuth();
-    }, []);
+    }, [navigate]);
 
     const saveAuth = (token, userData) => {
         if (token) localStorage.setItem("cognitoIdentity", token);
-        if (userData) {
-            setStep(userData.organization ? "dashboard" : "createOrg");
-        }
+        if (userData) setUser(userData);
+
+        // Navigate after login/register
+        if (userData?.organization) navigate("/dashboard", { replace: true });
+        else setStep("createOrg");
     };
 
     const logout = async () => {
