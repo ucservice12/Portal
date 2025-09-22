@@ -1,12 +1,7 @@
 import { Outlet } from "react-router-dom";
 import { AppSidebar } from "@/components/AppSidebar";
-import { Separator } from "@/components/ui/separator";
-import {
-  SidebarInset,
-  SidebarProvider,
-  SidebarTrigger,
-} from "@/components/ui/sidebar";
-import { BreadcrumbData } from "../custom/Breadcrumb";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { BreadcrumbData } from "@/components/custom/Breadcrumb";
 import Navbar from "@/components/layout/Navbar";
 
 export default function MainLayout() {

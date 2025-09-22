@@ -2,7 +2,7 @@
 
 // Icon names correspond to lucide-react
 export const subRouteMeta = {
-  Dashboard: { icon: "SquareTerminal", url: "/" },
+  Dashboard: { icon: "SquareTerminal", url: "/dashboard" },
   organizations: { icon: "Users2", url: "/superadmin/organizations/list" },
   Forms: { icon: "FileText", url: "/forms" },
 

@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,11 +8,13 @@ import { useAuth } from "@/context/AuthContext";
 import { login as loginApi } from "@/api/auth";
 
 export function LoginForm() {
-  const navigate = useNavigate();
-
   const { setStep, loading, saveAuth } = useAuth();
   const [formData, setFormData] = useState({ email: "", password: "" });
-  const [errors, setErrors] = useState({ email: "", password: "", general: "" });
+  const [errors, setErrors] = useState({
+    email: "",
+    password: "",
+    general: "",
+  });
   const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e) => {
@@ -56,12 +57,10 @@ export function LoginForm() {
 
       console.log("Login successfull:", res.data);
 
-      const { token } = res.data;
+      const { token, user: userData } = res.data;
 
       // Save token + user to localStorage
-      saveAuth(token);
-
-      if (res.data.user.organization ? navigate("/dashboard") : setStep("createOrg"));
+      saveAuth(token, userData);
 
       setErrors({ email: "", password: "", general: "" });
     } catch (err) {
