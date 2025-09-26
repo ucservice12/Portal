@@ -120,15 +120,22 @@ export const roleAccess = {
     "sales",
     "serviceRequest",
   ],
-  hrAdmin: ["employee", "hiring", "learning", "administration", "finance"],
-  HR: ["employee", "hiring", "finance"],
-  PayrollHR: ["employee", "finance"],
-  financeAdmin: ["finance", "employee"],
+  hrAdmin: [
+    "employee",
+    "hiring",
+    "learning",
+    "administration",
+    "finance",
+    "sales",
+  ],
+  hr: ["employee", "hiring", "learning"],
+  payrollHR: ["employee", "finance"],
+  finance: ["finance", "employee"],
   marketing: ["marketing", "employee"],
   sales: ["sales", "employee"],
   teamlead: ["employee", "projects"],
   manager: ["employee", "projects", "finance", "sales"],
-  employee: ["employee"],
+  employee: ["employee", "learning"],
 };
 
 // Permissions per module

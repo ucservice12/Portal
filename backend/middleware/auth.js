@@ -1,5 +1,5 @@
-const jwt = require('jsonwebtoken');
-const User = require('../models/User');
+const jwt = require("jsonwebtoken");
+const User = require("../models/User");
 
 // Protect routes
 exports.protect = async (req, res, next) => {
@@ -18,7 +18,13 @@ exports.protect = async (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = await User.findById(decoded.id);
+    const user = await User.findById(decoded.id);
+
+    if (!user) {
+      return res.status(401).json({ success: false, error: "Not authorized" });
+    }
+
+    req.user = user;
     next();
   } catch (err) {
     console.error(err);
@@ -27,14 +33,19 @@ exports.protect = async (req, res, next) => {
 };
 
 // Grant access to specific roles
-exports.authorize = (...roles) => {
+exports.authorize = (...allowedRoles) => {
   return (req, res, next) => {
-    if (!roles.includes(req.user.role)) {
+    const hasRole = req.user.roles.some((role) => allowedRoles.includes(role));
+
+    if (!hasRole) {
       return res.status(403).json({
         success: false,
-        error: `User role ${req.user.role} is not authorized to access this route`
+        error: `User role ${req.user.roles.join(
+          ", "
+        )} is not authorized to access this route`,
       });
     }
+
     next();
   };
 };

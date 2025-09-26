@@ -11,8 +11,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Link } from "react-router-dom";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Navbar() {
+  const { user, logout } = useAuth();
+
   return (
     <header className="fixed sm:w-[calc(100%-18rem)] w-full top-0 sm:right-0 z-40 h-17 bg-card dark:bg-[#0B0D0E] shadow-md px-4 sm:px-8 flex items-center gap-2 justify-end transition-all">
       {/* Sidebar trigger for small screens */}
@@ -51,9 +54,11 @@ export default function Navbar() {
                   <IoPersonSharp className="text-gray-600" />
                 </div>
                 <div>
-                  <div className="font-semibold text-base">User</div>
+                  <div className="font-semibold text-base capitalize">
+                    {user?.firstName} {user?.lastName}
+                  </div>
                   <div className="text-sm text-muted-foreground">
-                    User@gmail.com
+                    {user?.email}
                   </div>
                 </div>
               </div>
@@ -74,7 +79,10 @@ export default function Navbar() {
                 </DropdownMenuItem>
               </Link>
 
-              <DropdownMenuItem className="cursor-pointer gap-2 text-red-600 hover:text-red-700">
+              <DropdownMenuItem
+                onClick={logout}
+                className="cursor-pointer gap-2 text-red-600 hover:text-red-700"
+              >
                 {/* Sign Out Icon */}
                 <svg
                   xmlns="http://www.w3.org/2000/svg"

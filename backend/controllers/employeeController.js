@@ -1,5 +1,5 @@
-const Employee = require('../models/Employee');
-const User = require('../models/User');
+const Employee = require("../models/Employee");
+const User = require("../models/User");
 
 // @desc    Create new employee
 // @route   POST /api/v1/employees
@@ -8,21 +8,21 @@ exports.createEmployee = async (req, res) => {
   try {
     // Check if employee already exists for the user
     const existingEmployee = await Employee.findOne({ user: req.body.user });
-    
+
     if (existingEmployee) {
       return res.status(400).json({
         success: false,
-        error: 'Employee profile already exists for this user'
+        error: "Employee profile already exists for this user",
       });
     }
 
     // Check if user exists
     const user = await User.findById(req.body.user);
-    
+
     if (!user) {
       return res.status(404).json({
         success: false,
-        error: 'User not found'
+        error: "User not found",
       });
     }
 
@@ -31,12 +31,12 @@ exports.createEmployee = async (req, res) => {
 
     res.status(201).json({
       success: true,
-      data: employee
+      data: employee,
     });
   } catch (err) {
     res.status(400).json({
       success: false,
-      error: err.message
+      error: err.message,
     });
   }
 };
@@ -48,38 +48,41 @@ exports.getEmployees = async (req, res) => {
   try {
     // Filter by organization if provided
     let query = {};
-    
+
     if (req.query.organization) {
       query.organization = req.query.organization;
     }
 
     // Allow filtering by various fields
-    const removeFields = ['select', 'sort', 'page', 'limit'];
-    
+    const removeFields = ["select", "sort", "page", "limit"];
+
     // Loop over removeFields and delete them from reqQuery
-    removeFields.forEach(param => delete req.query[param]);
-    
+    removeFields.forEach((param) => delete req.query[param]);
+
     // Create query string
     let queryStr = JSON.stringify(req.query);
-    
+
     // Create operators ($gt, $gte, etc)
-    queryStr = queryStr.replace(/\b(gt|gte|lt|lte|in)\b/g, match => `$${match}`);
-    
+    queryStr = queryStr.replace(
+      /\b(gt|gte|lt|lte|in)\b/g,
+      (match) => `$${match}`
+    );
+
     // Finding resource
     query = Employee.find(JSON.parse(queryStr));
 
     // Select Fields
     if (req.query.select) {
-      const fields = req.query.select.split(',').join(' ');
+      const fields = req.query.select.split(",").join(" ");
       query = query.select(fields);
     }
 
     // Sort
     if (req.query.sort) {
-      const sortBy = req.query.sort.split(',').join(' ');
+      const sortBy = req.query.sort.split(",").join(" ");
       query = query.sort(sortBy);
     } else {
-      query = query.sort('-createdAt');
+      query = query.sort("-createdAt");
     }
 
     // Pagination
@@ -93,8 +96,8 @@ exports.getEmployees = async (req, res) => {
 
     // Populate
     query = query.populate([
-      { path: 'user', select: 'name email role' },
-      { path: 'organization', select: 'name' }
+      { path: "user", select: "name email role" },
+      { path: "organization", select: "name" },
     ]);
 
     // Executing query
@@ -106,14 +109,14 @@ exports.getEmployees = async (req, res) => {
     if (endIndex < total) {
       pagination.next = {
         page: page + 1,
-        limit
+        limit,
       };
     }
 
     if (startIndex > 0) {
       pagination.prev = {
         page: page - 1,
-        limit
+        limit,
       };
     }
 
@@ -121,12 +124,12 @@ exports.getEmployees = async (req, res) => {
       success: true,
       count: employees.length,
       pagination,
-      data: employees
+      data: employees,
     });
   } catch (err) {
     res.status(400).json({
       success: false,
-      error: err.message
+      error: err.message,
     });
   }
 };
@@ -136,27 +139,26 @@ exports.getEmployees = async (req, res) => {
 // @access  Private
 exports.getEmployee = async (req, res) => {
   try {
-    const employee = await Employee.findById(req.params.id)
-      .populate([
-        { path: 'user', select: 'name email role' },
-        { path: 'organization', select: 'name' }
-      ]);
+    const employee = await Employee.findById(req.params.id).populate([
+      { path: "user", select: "name email role" },
+      { path: "organization", select: "name" },
+    ]);
 
     if (!employee) {
       return res.status(404).json({
         success: false,
-        error: 'Employee not found'
+        error: "Employee not found",
       });
     }
 
     res.status(200).json({
       success: true,
-      data: employee
+      data: employee,
     });
   } catch (err) {
     res.status(400).json({
       success: false,
-      error: err.message
+      error: err.message,
     });
   }
 };
@@ -171,35 +173,35 @@ exports.updateEmployee = async (req, res) => {
     if (!employee) {
       return res.status(404).json({
         success: false,
-        error: 'Employee not found'
+        error: "Employee not found",
       });
     }
 
     // Make sure user is employee owner or admin
     if (
-      req.user.role !== 'admin' && 
-      req.user.role !== 'hr' && 
+      req.user.role !== "admin" &&
+      req.user.role !== "hr" &&
       employee.user.toString() !== req.user.id
     ) {
       return res.status(401).json({
         success: false,
-        error: `User ${req.user.id} is not authorized to update this employee`
+        error: `User ${req.user.id} is not authorized to update this employee`,
       });
     }
 
     employee = await Employee.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
-      runValidators: true
+      runValidators: true,
     });
 
     res.status(200).json({
       success: true,
-      data: employee
+      data: employee,
     });
   } catch (err) {
     res.status(400).json({
       success: false,
-      error: err.message
+      error: err.message,
     });
   }
 };
@@ -214,15 +216,15 @@ exports.deleteEmployee = async (req, res) => {
     if (!employee) {
       return res.status(404).json({
         success: false,
-        error: 'Employee not found'
+        error: "Employee not found",
       });
     }
 
     // Make sure user is admin
-    if (req.user.role !== 'admin') {
+    if (req.user.role !== "admin") {
       return res.status(401).json({
         success: false,
-        error: `User ${req.user.id} is not authorized to delete this employee`
+        error: `User ${req.user.id} is not authorized to delete this employee`,
       });
     }
 
@@ -230,12 +232,12 @@ exports.deleteEmployee = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      data: {}
+      data: {},
     });
   } catch (err) {
     res.status(400).json({
       success: false,
-      error: err.message
+      error: err.message,
     });
   }
 };

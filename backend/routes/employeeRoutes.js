@@ -1,25 +1,25 @@
-const express = require('express');
+const express = require("express");
 const {
   createEmployee,
   getEmployees,
   getEmployee,
   updateEmployee,
-  deleteEmployee
-} = require('../controllers/employeeController');
+  deleteEmployee,
+} = require("../controllers/employeeController");
 
-const { protect, authorize } = require('../middleware/auth');
+const { protect, authorize } = require("../middleware/auth");
 
 const router = express.Router();
 
 router
-  .route('/')
-  .get(protect, authorize('admin', 'hr', 'manager'), getEmployees)
-  .post(protect, authorize('admin', 'hr'), createEmployee);
+  .route("/")
+  .get(protect, authorize("admin", "hr", "manager", "superadmin"), getEmployees)
+  .post(protect, authorize("admin", "hr", "superadmin"), createEmployee);
 
 router
-  .route('/:id')
+  .route("/:id")
   .get(protect, getEmployee)
-  .put(protect, authorize('admin', 'hr'), updateEmployee)
-  .delete(protect, authorize('admin'), deleteEmployee);
+  .put(protect, authorize("admin", "hr", "superadmin"), updateEmployee)
+  .delete(protect, authorize("admin", "superadmin"), deleteEmployee);
 
 module.exports = router;

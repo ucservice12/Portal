@@ -1,6 +1,6 @@
 const crypto = require("crypto");
 const User = require("../models/User");
-const Organization = require('../models/Organization');
+const Organization = require("../models/Organization");
 const NotificationTriggers = require("../utils/notificationTriggers");
 const { sendEmail } = require("../utils/nodemailer");
 const { setOtp, getOtp, deleteOtp } = require("../utils/otpStore");
@@ -12,17 +12,23 @@ exports.registerOrVerify = async (req, res) => {
     const { email, otp, firstName, password } = req.body;
 
     if (!email) {
-      return res.status(400).json({ success: false, error: "Email is required" });
+      return res
+        .status(400)
+        .json({ success: false, error: "Email is required" });
     }
 
     // STEP 1: Send OTP
     if (!otp) {
       const existingUser = await User.findOne({ email });
       if (existingUser) {
-        return res.status(409).json({ success: false, error: "User already exists. Please Login" });
+        return res
+          .status(409)
+          .json({ success: false, error: "User already exists. Please Login" });
       }
 
-      const generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
+      const generatedOtp = Math.floor(
+        100000 + Math.random() * 900000
+      ).toString();
       setOtp(email, generatedOtp);
 
       await sendEmail({
@@ -31,17 +37,25 @@ exports.registerOrVerify = async (req, res) => {
         html: `<h3>Your verification code is: <b>${generatedOtp}</b></h3><p>Valid for 10 minutes.</p>`,
       });
 
-      return res.status(200).json({ success: true, step: "verifyOtp", message: "OTP sent successfully" });
+      return res.status(200).json({
+        success: true,
+        step: "verifyOtp",
+        message: "OTP sent successfully",
+      });
     }
 
     // STEP 2: Verify OTP
     const record = getOtp(email);
-    if (!record) return res.status(400).json({ success: false, error: "OTP not found or expired" });
+    if (!record)
+      return res
+        .status(400)
+        .json({ success: false, error: "OTP not found or expired" });
     if (Date.now() > record.expiresAt) {
       deleteOtp(email);
       return res.status(400).json({ success: false, error: "OTP expired" });
     }
-    if (record.otp !== otp) return res.status(400).json({ success: false, error: "Invalid OTP" });
+    if (record.otp !== otp)
+      return res.status(400).json({ success: false, error: "Invalid OTP" });
 
     deleteOtp(email);
 
@@ -51,7 +65,7 @@ exports.registerOrVerify = async (req, res) => {
       email,
       password,
       status: "active",
-      role: "admin",
+      roles: ["admin"],
     });
 
     // STEP 4: Send JWT
@@ -67,32 +81,48 @@ exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
     if (!email || !password) {
-      return res.status(400).json({ success: false, error: "Please provide email and password" });
+      return res
+        .status(400)
+        .json({ success: false, error: "Please provide email and password" });
     }
 
     const user = await User.findOne({ email })
       .select("+password")
       .populate("organization", "name subscription isActive");
 
-    if (!user) return res.status(401).json({ success: false, error: "Invalid credentials" });
+    if (!user)
+      return res
+        .status(401)
+        .json({ success: false, error: "Invalid credentials" });
 
     if (user.status !== "active") {
-      return res.status(401).json({ success: false, error: "Account inactive. Contact admin." });
+      return res
+        .status(401)
+        .json({ success: false, error: "Account inactive. Contact admin." });
     }
 
     if (user.organization && !user.organization.isActive) {
-      return res.status(401).json({ success: false, error: "Organization inactive. Contact support." });
+      return res.status(401).json({
+        success: false,
+        error: "Organization inactive. Contact support.",
+      });
     }
 
     if (user.organization?.subscription) {
       const subStatus = user.organization.subscription.status;
       if (["expired", "inactive"].includes(subStatus)) {
-        return res.status(401).json({ success: false, error: `Subscription ${subStatus}. Please renew.` });
+        return res.status(401).json({
+          success: false,
+          error: `Subscription ${subStatus}. Please renew.`,
+        });
       }
     }
 
     const isMatch = await user.matchPassword(password);
-    if (!isMatch) return res.status(401).json({ success: false, error: "Invalid credentials" });
+    if (!isMatch)
+      return res
+        .status(401)
+        .json({ success: false, error: "Invalid credentials" });
 
     user.lastLogin = new Date();
     await user.save();
@@ -107,11 +137,12 @@ exports.login = async (req, res) => {
 // ================== GET ME ==================
 exports.getMe = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).populate('organization');
-    if (!user) return res.status(404).json({ success: false, error: 'User not found' });
+    const user = await User.findById(req.user.id).populate("organization");
+    if (!user)
+      return res.status(404).json({ success: false, error: "User not found" });
 
     if (user.organization && user.organization.isExpired()) {
-      user.organization.subscription.status = 'expired';
+      user.organization.subscription.status = "expired";
       user.organization.isActive = false;
       await user.organization.save();
     }
@@ -149,7 +180,9 @@ exports.updatePassword = async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select("+password");
     if (!(await user.matchPassword(req.body.currentPassword))) {
-      return res.status(401).json({ success: false, error: "Password incorrect" });
+      return res
+        .status(401)
+        .json({ success: false, error: "Password incorrect" });
     }
     user.password = req.body.newPassword;
     await user.save();
@@ -165,13 +198,15 @@ exports.forgotPassword = async (req, res) => {
     const email = req.body.email.trim().toLowerCase();
     const user = await User.findOne({ email });
     if (!user)
-      return res.status(404).json({ success: false, error: "No user found with that email" });
+      return res
+        .status(404)
+        .json({ success: false, error: "No user found with that email" });
 
     // Generate OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
     // Store OTP properly
-    setOtp(email, otp);  // Now OTP stored as { otp, expiresAt }
+    setOtp(email, otp); // Now OTP stored as { otp, expiresAt }
 
     // Send OTP email
     await sendEmail({
@@ -185,7 +220,6 @@ exports.forgotPassword = async (req, res) => {
       step: "verifyOtp",
       message: "OTP sent successfully",
     });
-
   } catch (err) {
     console.error("forgotPassword error:", err);
     return res.status(500).json({ success: false, error: "Server error" });
@@ -200,21 +234,30 @@ exports.verifyForgotOtp = async (req, res) => {
     const record = getOtp(email); // this must not be undefined if OTP was set
 
     if (!record || !record.otp) {
-      return res.status(400).json({ success: false, error: "No OTP found. Please request a new one." });
+      return res.status(400).json({
+        success: false,
+        error: "No OTP found. Please request a new one.",
+      });
     }
 
     if (Date.now() > record.expiresAt) {
       deleteOtp(email);
-      return res.status(400).json({ success: false, error: "OTP expired. Please request a new one." });
+      return res.status(400).json({
+        success: false,
+        error: "OTP expired. Please request a new one.",
+      });
     }
 
     if (record.otp !== otp) {
-      return res.status(400).json({ success: false, error: "Invalid OTP. Please check and try again." });
+      return res.status(400).json({
+        success: false,
+        error: "Invalid OTP. Please check and try again.",
+      });
     }
 
     // OTP verified
-    deleteOtp(email);       // remove old OTP
-    markVerified(email);    // mark email verified for password reset
+    deleteOtp(email); // remove old OTP
+    markVerified(email); // mark email verified for password reset
 
     return res.status(200).json({
       success: true,
@@ -227,7 +270,6 @@ exports.verifyForgotOtp = async (req, res) => {
   }
 };
 
-
 // ================== RESET PASSWORD (Step 3) ==================
 exports.resetPassword = async (req, res) => {
   try {
@@ -236,11 +278,15 @@ exports.resetPassword = async (req, res) => {
 
     const record = getOtp(email);
     if (!record || !record.verified) {
-      return res.status(400).json({ success: false, error: "OTP not verified. Cannot reset password." });
+      return res.status(400).json({
+        success: false,
+        error: "OTP not verified. Cannot reset password.",
+      });
     }
 
     const user = await User.findOne({ email });
-    if (!user) return res.status(404).json({ success: false, error: "User not found" });
+    if (!user)
+      return res.status(404).json({ success: false, error: "User not found" });
 
     user.password = newPassword;
     await user.save();

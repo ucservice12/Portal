@@ -22,8 +22,6 @@ export function PaymentForm() {
   const { orgName, users, selectedPlan } = useOrganization();
   const { setStep, user, setUser, saveAuth } = useAuth();
 
-  console.log("user in payment form:", user);
-
   const [formData, setFormData] = useState({
     name: "",
     cardNumber: "",
@@ -127,7 +125,7 @@ export function PaymentForm() {
       };
 
       await handleCreateOrg(payload);
-      // setStep("dashboard"); 
+      // setStep("dashboard");
     } catch (err) {
       console.error("Payment Error:", err);
       setApiError(
@@ -151,7 +149,7 @@ export function PaymentForm() {
 
       const payload = {
         name: orgName?.trim(),
-        createdBy: user?._id,
+        createdBy: user?._id || user.id,
         size: users <= 10 ? "1-10" : users <= 50 ? "11-50" : "51-200",
         contact: { email: user?.email },
         subscription: {
@@ -176,8 +174,7 @@ export function PaymentForm() {
       };
 
       await handleCreateOrg(payload);
-      setStep("dashboard"); 
-
+      setStep("dashboard");
     } catch (err) {
       console.error("Skip Payment Error:", err);
       setApiError(err.response?.data?.message || "Failed. Please try again.");

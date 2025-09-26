@@ -21,6 +21,7 @@ connectDB();
 
 // Route files
 const authRoutes = require("./routes/authRoutes");
+const employeeRoutes = require("./routes/employeeRoutes");
 const organizationRoutes = require("./routes/organizationRoutes");
 const leadRoutes = require("./routes/leadRoutes");
 const contactRoutes = require("./routes/contactRoutes");
@@ -79,6 +80,7 @@ app.use(express.static(path.join(__dirname, "../public")));
 
 // Mount routers
 app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/employees", employeeRoutes);
 app.use("/api/v1/organizations", organizationRoutes);
 app.use("/api/v1/leads", leadRoutes);
 app.use("/api/v1/contacts", contactRoutes);

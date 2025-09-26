@@ -15,9 +15,10 @@ import {
   XAxis,
   YAxis,
   Tooltip,
+  LabelList,
 } from "recharts";
 
-// Sample data
+// Sample timesheet data
 const timesheetData = [
   { day: "Mon", hours: 7 },
   { day: "Tue", hours: 5 },
@@ -28,10 +29,27 @@ const timesheetData = [
   { day: "Sun", hours: 0 },
 ];
 
+// Custom bar shape component
+const CustomBar = (props) => {
+  const { x, y, width, height, fill } = props;
+  const radius = 6; // rounded corner radius
+  return (
+    <rect
+      x={x}
+      y={y}
+      width={width}
+      height={height}
+      rx={radius}
+      ry={radius}
+      fill={fill}
+    />
+  );
+};
+
 export function Timesheet() {
   return (
     <Card>
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center mb-4">
         <TypographyH4>Timesheet</TypographyH4>
         <Select>
           <SelectTrigger className="w-36 h-8">
@@ -44,54 +62,62 @@ export function Timesheet() {
         </Select>
       </div>
 
-      <div>
-        <div className="h-56 rounded-2xl border py-2">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={timesheetData}>
-              <XAxis
-                dataKey="day"
-                axisLine={false}
-                tickLine={false}
-                stroke="currentColor"
-                className="text-muted-foreground text-xs"
-              />
-              <YAxis
-                domain={[0, 24]}
-                tickCount={5}
-                axisLine={false}
-                tickLine={false}
-                stroke="currentColor"
-                className="text-muted-foreground text-xs"
-              />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: "hsl(var(--popover))",
-                  border: "1px solid hsl(var(--border))",
-                  borderRadius: "0.375rem",
-                  fontSize: "0.75rem",
-                }}
-                labelStyle={{
-                  color: "hsl(var(--foreground))",
-                }}
-                itemStyle={{
-                  color: "hsl(var(--foreground))",
-                }}
-              />
-              <Bar
+      <div className="h-56 rounded-2xl border py-2 px-2">
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart data={timesheetData} margin={{ top: 10, bottom: 10 }}>
+            <XAxis
+              dataKey="day"
+              axisLine={false}
+              tickLine={false}
+              stroke="currentColor"
+              className="text-muted-foreground text-xs"
+            />
+            <YAxis
+              domain={[0, 24]}
+              tickCount={5}
+              axisLine={false}
+              tickLine={false}
+              stroke="currentColor"
+              className="text-muted-foreground text-xs"
+            />
+            <Tooltip
+              contentStyle={{
+                backgroundColor: "hsl(var(--popover))",
+                border: "1px solid hsl(var(--border))",
+                borderRadius: "0.375rem",
+                fontSize: "0.75rem",
+              }}
+              labelStyle={{
+                color: "hsl(var(--foreground))",
+              }}
+              itemStyle={{
+                color: "hsl(var(--foreground))",
+              }}
+            />
+            <Bar
+              dataKey="hours"
+              fill="hsl(var(--primary))"
+              radius={[6, 6, 0, 0]}
+              barSize={20}
+              shape={<CustomBar />}
+            >
+              <LabelList
                 dataKey="hours"
-                fill="hsl(var(--primary))"
-                radius={[4, 4, 0, 0]}
-                barSize={14}
+                position="top"
+                style={{
+                  fill: "hsl(var(--foreground))",
+                  fontSize: 12,
+                  fontWeight: 500,
+                }}
               />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-
-        <Button className="w-full mt-4" size="sm">
-          Submit Timesheet
-        </Button>
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
       </div>
+
+      <Button className="w-full mt-4" size="sm">
+        Submit Timesheet
+      </Button>
     </Card>
   );
 }
-    

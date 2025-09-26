@@ -23,10 +23,12 @@ export function NavMain({ items }) {
     <SidebarGroup>
       <SidebarMenu>
         {items.map((item) => {
-          // check if any subItem matches current URL → keep parent open
-          const isParentActive = item.items?.some(
-            (subItem) => location.pathname === subItem.url
-          );
+          // check if parent path matches OR any child matches
+          const isParentActive =
+            location.pathname.startsWith(item.url || "") ||
+            item.items?.some((sub) =>
+              location.pathname.startsWith(sub.url || "")
+            );
 
           return (
             <Collapsible
@@ -41,7 +43,7 @@ export function NavMain({ items }) {
                     tooltip={item.title}
                     className={cn(
                       "flex items-center gap-2",
-                      isParentActive && "bg-primary font-medium"
+                      isParentActive && "bg-primary font-medium text-white"
                     )}
                   >
                     {item.icon && <item.icon />}
@@ -49,32 +51,36 @@ export function NavMain({ items }) {
                   </SidebarMenuButton>
                 </CollapsibleTrigger>
 
-                <CollapsibleContent>
-                  <SidebarMenuSub>
-                    {item.items?.map((subItem) => {
-                      const isActive = location.pathname === subItem.url;
+                {item.items && (
+                  <CollapsibleContent>
+                    <SidebarMenuSub>
+                      {item.items.map((subItem) => {
+                        const isActive = location.pathname.startsWith(
+                          subItem.url || ""
+                        );
 
-                      return (
-                        <SidebarMenuSubItem key={subItem.title}>
-                          <SidebarMenuSubButton asChild>
-                            <Link
-                              to={subItem.url}
-                              className={cn(
-                                "ml-3 flex items-center gap-2 rounded-md px-2 py-1 transition-colors",
-                                isActive
-                                  ? "bg-primary/75 text-white"
-                                  : "hover:bg-muted"
-                              )}
-                            >
-                              <IconWrapper name={subItem.icon} size={18} />
-                              <span>{subItem.title}</span>
-                            </Link>
-                          </SidebarMenuSubButton>
-                        </SidebarMenuSubItem>
-                      );
-                    })}
-                  </SidebarMenuSub>
-                </CollapsibleContent>
+                        return (
+                          <SidebarMenuSubItem key={subItem.title}>
+                            <SidebarMenuSubButton asChild>
+                              <Link
+                                to={subItem.url || "#"}
+                                className={cn(
+                                  "ml-3 flex items-center gap-2 rounded-md px-2 py-1 transition-colors",
+                                  isActive
+                                    ? "bg-primary/75 text-white"
+                                    : "hover:bg-muted"
+                                )}
+                              >
+                                <IconWrapper name={subItem.icon} size={18} />
+                                <span>{subItem.title}</span>
+                              </Link>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+                        );
+                      })}
+                    </SidebarMenuSub>
+                  </CollapsibleContent>
+                )}
               </SidebarMenuItem>
             </Collapsible>
           );

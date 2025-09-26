@@ -13,8 +13,6 @@ export const OrganizationProvider = ({ children }) => {
   const [users, setUsers] = useState(1);
   const [paymentData, setPaymentData] = useState({});
 
-  console.log("organizations", organizations);
-
   return (
     <OrganizationContext.Provider
       value={{

@@ -3,19 +3,15 @@ import MainLayout from "@/components/layout/MainLayout";
 import AuthLayout from "@/components/authLayout/AuthLayout";
 import { ProtectedRoute } from "@/routes/ProtectedRoute";
 import { useAuth } from "@/context/AuthContext";
-import { getRoutesForRole } from "@/lib/getRoutesForRole";
-import { pageComponents } from "@/data/pageComponents";
+import { appRoutes } from "@/routes/appRoutes";
 
 export default function App() {
-  const { user, loading } = useAuth();
+  const { loading } = useAuth();
 
   if (loading)
     return (
       <p className="flex justify-center items-center h-screen">Loading...</p>
     );
-
-  const currentUserRole = user?.role || "employee";
-  const routes = getRoutesForRole(currentUserRole);
 
   return (
     <Routes>
@@ -25,22 +21,42 @@ export default function App() {
       {/* Protected */}
       <Route element={<ProtectedRoute />}>
         <Route element={<MainLayout />}>
-          {routes.map((route) => {
-            const Component = pageComponents[route.name];
-            if (!Component) return null;
-            return (
-              <Route
-                key={route.url}
-                path={route.url.slice(1)}
-                element={<Component />}
-              />
-            );
-          })}
+          {/* Dynamically render all appRoutes */}
+          {appRoutes.map(({ path, element, children }) => (
+            <Route key={path} path={path} element={element}>
+              {/* Render children if nested routes exist */}
+              {children &&
+                children.map(({ path: childPath, element: childElement }) => (
+                  <Route
+                    key={childPath}
+                    path={childPath}
+                    element={childElement}
+                  />
+                ))}
+            </Route>
+          ))}
+
+          {/* Catch-all 404 inside MainLayout */}
+          <Route
+            path="*"
+            element={
+              <div className="flex justify-center items-center">
+                <h1 className="text-3xl font-bold">Comming Soon...</h1>
+              </div>
+            }
+          />
         </Route>
       </Route>
 
-      {/* 404 */}
-      <Route path="*" element={<h1>404 - Page Not Found</h1>} />
+      {/* Global 404 for non-protected paths */}
+      <Route
+        path="*"
+        element={
+          <div className="flex justify-center items-center h-screen">
+            <h1 className="text-3xl font-bold">404 - Page Not Found</h1>
+          </div>
+        }
+      />
     </Routes>
   );
 }

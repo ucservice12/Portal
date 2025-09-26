@@ -9,6 +9,7 @@ export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [step, setStep] = useState("login");
+  const [token, setToken] = useState("");
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -16,6 +17,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const initAuth = async () => {
       const token = localStorage.getItem("cognitoIdentity");
+      setToken(token);
       if (!token) {
         setLoading(false);
         return;
@@ -79,7 +81,18 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ step, setStep, user, setUser, saveAuth, loading, logout }}
+      value={{
+        token,
+        setToken,
+        step,
+        setStep,
+        user,
+        setUser,
+        saveAuth,
+        loading,
+        setLoading,
+        logout,
+      }}
     >
       {children}
     </AuthContext.Provider>

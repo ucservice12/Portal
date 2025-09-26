@@ -1,16 +1,14 @@
 import React, { useState } from "react";
 import { AudioWaveform, Command, GalleryVerticalEnd } from "lucide-react";
 import { NavMain } from "@/components/NavMain";
-import { NavUser } from "@/components/NavUser";
 import { TeamSwitcher } from "@/components/TeamSwitcher";
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import { getRoutesForRole } from "@/lib/getRoutesForRole";
+import { getRoutesForRoles } from "@/lib/getRoutesForRole";
 import { useAuth } from "@/context/AuthContext";
 
 // Helpers
@@ -31,8 +29,9 @@ function getSectionTitle(module) {
 
 export function AppSidebar(props) {
   const { user } = useAuth();
-  const currentUserRole = user?.role || "employee";
-  const sidebarRoutes = getRoutesForRole(currentUserRole);
+
+  const currentUserRole = user?.roles || "employee";
+  const sidebarRoutes = getRoutesForRoles(currentUserRole);
   const groupedRoutes = groupRoutesByModule(sidebarRoutes);
 
   // State to track which section is open
@@ -44,7 +43,7 @@ export function AppSidebar(props) {
     title: getSectionTitle(module),
     url: "#",
     isActive: openSection === module,
-    onToggle: () => setOpenSection(openSection === module ? "" : module), // toggle behavior
+    onToggle: () => setOpenSection(openSection === module ? "" : module),
     items: items.map((item) => ({
       title: item.name,
       url: item.url,
