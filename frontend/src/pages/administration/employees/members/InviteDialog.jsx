@@ -19,7 +19,7 @@ export default function InviteDialog({
 }) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="sm:max-w-md w-full">
+      <DialogContent className="">
         <DialogHeader>
           <TypographyH5>Invite Member</TypographyH5>
           <DialogTitle></DialogTitle>

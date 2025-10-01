@@ -6,7 +6,7 @@ import {
 } from "@/components/custom/tabs/Tabs";
 import AdminSettings from "@/pages/administration/AdminSettings";
 import Attendances from "@/pages/administration/Attendances";
-import Inventory from "@/pages/administration/Inventory";
+import Inventory from "@/pages/administration/inventory/Inventory";
 import Members from "@/pages/administration/employees/members/Members";
 import Invitations from "@/pages/administration/employees/Invitations";
 import Permissions from "@/pages/administration/employees/Permissions";

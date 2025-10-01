@@ -3,10 +3,16 @@ import {
   EmployeeCalenderTabs,
   EmployeeGoalsTabs,
 } from "@/components/custom/tabs/Tabs";
+
+// goals dasboard
+import GoalsList from "@/pages/employee/goals/GoalsList";
+import Achievement from "@/pages/employee/goals/Achievement";
+import GoalsDashboard from "@/pages/employee/goals/GoalsDashboard";
+
+import Attendance from "@/pages/employee/attendance/Attendance";
+
 import Tasks from "@/pages/employee/Tasks";
-import Goals from "@/pages/employee/Goals";
 import LogHours from "@/pages/employee/LogHours";
-import Attendance from "@/pages/employee/Attendance";
 import Dashboard from "@/pages/dashboard/Dashboard";
 import Profile from "@/pages/employee/setting/Profile";
 import Inventory from "@/pages/employee/setting/Inventory";
@@ -39,17 +45,17 @@ export const employeeRoutes = [
     children: [
       {
         path: "dashboard",
-        element: <Goals />,
+        element: <GoalsDashboard />,
         roles: ["employee", "hr", "admin"],
       },
       {
         path: "goals-list",
-        element: <h1>Goals List</h1>,
+        element: <GoalsList />,
         roles: ["employee", "hr", "admin"],
       },
       {
         path: "achievement",
-        element: <h1>Achievement</h1>,
+        element: <Achievement />,
         roles: ["employee", "hr", "admin"],
       },
     ],

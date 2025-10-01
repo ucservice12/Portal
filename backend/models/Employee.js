@@ -1,59 +1,59 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const EmployeeSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.ObjectId,
-    ref: 'User',
+    ref: "User",
     required: true,
-    unique: true
+    unique: true,
   },
   organization: {
     type: mongoose.Schema.ObjectId,
-    ref: 'Organization',
-    required: true
+    ref: "Organization",
+    required: true,
   },
   employeeId: {
     type: String,
-    required: [true, 'Please add an employee ID'],
+    required: [true, "Please add an employee ID"],
     unique: true,
-    trim: true
+    trim: true,
   },
   personalDetails: {
     dateOfBirth: Date,
     gender: {
       type: String,
-      enum: ['male', 'female', 'other']
+      enum: ["male", "female", "other"],
     },
     bloodGroup: String,
     maritalStatus: {
       type: String,
-      enum: ['single', 'married', 'divorced', 'widowed']
+      enum: ["single", "married", "divorced", "widowed"],
     },
     emergencyContact: {
       name: String,
       relation: String,
-      phone: String
-    }
+      phone: String,
+    },
   },
   employmentDetails: {
     designation: String,
     department: String,
     reportsTo: {
       type: mongoose.Schema.ObjectId,
-      ref: 'User'
+      ref: "User",
     },
     jobDescription: String,
     employmentType: {
       type: String,
-      enum: ['full-time', 'part-time', 'contract', 'intern']
+      enum: ["full-time", "part-time", "contract", "intern"],
     },
-    workLocation: String
+    workLocation: String,
   },
   bankDetails: {
     accountNumber: String,
     bankName: String,
     ifscCode: String,
-    panNumber: String
+    panNumber: String,
   },
   documents: [
     {
@@ -62,14 +62,14 @@ const EmployeeSchema = new mongoose.Schema({
       url: String,
       uploadedAt: {
         type: Date,
-        default: Date.now
-      }
-    }
+        default: Date.now,
+      },
+    },
   ],
   createdAt: {
     type: Date,
-    default: Date.now
-  }
+    default: Date.now,
+  },
 });
 
-module.exports = mongoose.model('Employee', EmployeeSchema);
+module.exports = mongoose.model("Employee", EmployeeSchema);
