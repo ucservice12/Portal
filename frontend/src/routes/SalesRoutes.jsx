@@ -32,15 +32,17 @@ import ProposalDocument from "@/pages/sales/future-sales/proposal/ProposalDocume
 import { CreateEstimate } from "@/pages/sales/future-sales/estimate/CreateEstimate";
 import Estimatesdetails from "@/pages/sales/future-sales/estimate/Estimatesdetails";
 import { EditEstimate } from "@/pages/sales/future-sales/estimate/EditEstimate";
-import ProductService from "../pages/sales/sales-settings/products/ProductService";
-import Taxes from "../pages/sales/sales-settings/taxes/Taxes";
-import ChooseCurrency from "../pages/sales/sales-settings/ChooseCurrency";
-import Customers from "../pages/sales/sales-settings/customers/Customers";
-import Footer from "../pages/sales/sales-settings/footer/Footer";
-import NotesAndTerms from "../pages/sales/sales-settings/notes-terms/NotesAndTerms";
-import Industries from "../pages/sales/sales-settings/industries/Industries";
-import VerifyEmails from "../pages/sales/sales-settings/verify-emails/VerifyEmails";
-import MeetingLinks from "../pages/sales/sales-settings/metting-links/MeetingLinks";
+
+// settings
+import ProductService from "@/pages/sales/sales-settings/products/ProductService";
+import Taxes from "@/pages/sales/sales-settings/taxes/Taxes";
+import ChooseCurrency from "@/pages/sales/sales-settings/ChooseCurrency";
+import Customers from "@/pages/sales/sales-settings/customers/Customers";
+import Footer from "@/pages/sales/sales-settings/footer/Footer";
+import NotesAndTerms from "@/pages/sales/sales-settings/notes-terms/NotesAndTerms";
+import Industries from "@/pages/sales/sales-settings/industries/Industries";
+import VerifyEmails from "@/pages/sales/sales-settings/verify-emails/VerifyEmails";
+import MeetingLinks from "@/pages/sales/sales-settings/metting-links/MeetingLinks";
 
 // sales-settings
 
@@ -56,7 +58,7 @@ export const salesRoutes = [
     roles: ["sales", "hr", "admin"],
     children: [
       {
-        index: true,
+        path: "",
         element: <ContactList />,
         roles: ["sales", "hr", "admin"],
       },
@@ -74,7 +76,7 @@ export const salesRoutes = [
     element: <MyThingsSalesTabs />,
     roles: ["sales", "hr", "admin"],
     children: [
-      { index: true, element: <Tasks />, roles: ["sales", "hr", "admin"] },
+      { path: "", element: <Tasks />, roles: ["sales", "hr", "admin"] },
       {
         path: "deals",
         element: <Deals />,
@@ -98,7 +100,7 @@ export const salesRoutes = [
     roles: ["sales", "hr", "admin"],
     children: [
       {
-        index: true,
+        path: "",
         element: <CurrentSalesPayment />,
         roles: ["sales", "hr", "admin"],
       },
@@ -140,7 +142,7 @@ export const salesRoutes = [
     roles: ["sales", "hr", "admin"],
     children: [
       {
-        index: true,
+        path: "",
         element: <FutureSalesEstimate />,
         roles: ["sales", "hr", "admin"],
       },
@@ -182,7 +184,7 @@ export const salesRoutes = [
     roles: ["sales", "hr", "admin"],
     children: [
       {
-        index: true,
+        path: "",
         element: <ProductService />,
         roles: ["sales", "hr", "admin"],
       },

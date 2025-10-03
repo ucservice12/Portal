@@ -5,11 +5,18 @@ import {
   FinanceSettingsTabs,
 } from "@/components/custom/tabs/Tabs";
 import FinanceBoard from "@/pages/finance/FinanceBoard";
-import Transactions from "@/pages/finance/Transactions";
-import Purchases from "@/pages/finance/Purchases";
-import Income from "@/pages/finance/Income";
-import Reports from "@/pages/finance/Reports";
-import Setting from "@/pages/finance/Setting";
+import Transactions from "@/pages/finance/transactions/Transactions";
+
+import ProductService from "@/pages/sales/sales-settings/products/ProductService";
+import Vendors from "@/pages/finance/settings/vendor/Vendors";
+import FiscalYear from "@/pages/finance/settings/fiscalyear/FiscalYear";
+import Bills from "@/pages/finance/purchases/bills/Bills";
+import Reimbursements from "@/pages/finance/purchases/reimbursements/reimbursements";
+import Income from "@/pages/finance/incomes/Income";
+import Invoices from "@/pages/finance/incomes/Invoices";
+import BalanceSheet from "@/pages/finance/reports/BalanceSheet";
+import ProfitLoss from "@/pages/finance/reports/ProfitLoss";
+import CashFlow from "@/pages/finance/reports/CashFlow";
 
 export const financeRoutes = [
   {
@@ -28,18 +35,13 @@ export const financeRoutes = [
     roles: ["finance", "admin", "hr"],
     children: [
       {
-        index: true,
-        element: <Purchases />,
-        roles: ["finance", "admin", "hr"],
-      },
-      {
-        path: "bills",
-        element: <h1>Bills</h1>,
+        path: "",
+        element: <Bills />,
         roles: ["finance", "admin", "hr"],
       },
       {
         path: "reimbursements",
-        element: <h1>Reimbursements</h1>,
+        element: <Reimbursements />,
         roles: ["finance", "admin", "hr"],
       },
     ],
@@ -49,10 +51,14 @@ export const financeRoutes = [
     element: <IncomeTabs />,
     roles: ["finance", "admin", "hr"],
     children: [
-      { index: true, element: <Income />, roles: ["finance", "admin", "hr"] },
+      {
+        path: "",
+        element: <Income />,
+        roles: ["finance", "admin", "hr"],
+      },
       {
         path: "invoices",
-        element: <h1>Invoices</h1>,
+        element: <Invoices />,
         roles: ["finance", "admin", "hr"],
       },
     ],
@@ -64,17 +70,17 @@ export const financeRoutes = [
     children: [
       {
         path: "profit-loss",
-        element: <Reports />,
+        element: <ProfitLoss />,
         roles: ["finance", "admin", "hr"],
       },
       {
         path: "cash-flow",
-        element: <h1>Cash Flow</h1>,
+        element: <CashFlow />,
         roles: ["finance", "admin", "hr"],
       },
       {
         path: "balance-sheet",
-        element: <h1>Balance Sheet</h1>,
+        element: <BalanceSheet />,
         roles: ["finance", "admin", "hr"],
       },
     ],
@@ -84,15 +90,19 @@ export const financeRoutes = [
     element: <FinanceSettingsTabs />,
     roles: ["finance", "admin", "hr"],
     children: [
-      { index: true, element: <Setting />, roles: ["finance", "admin", "hr"] },
+      {
+        path: "",
+        element: <FiscalYear />,
+        roles: ["finance", "admin", "hr"],
+      },
       {
         path: "products&services",
-        element: <h1>Products & Services</h1>,
+        element: <ProductService />,
         roles: ["finance", "admin", "hr"],
       },
       {
         path: "vendors",
-        element: <h1>Vendors</h1>,
+        element: <Vendors />,
         roles: ["finance", "admin", "hr"],
       },
     ],
