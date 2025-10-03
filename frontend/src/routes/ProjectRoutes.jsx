@@ -1,45 +1,54 @@
 import { ProjectTabs } from "@/components/custom/tabs/Tabs";
-import Projects from "@/pages/projects/Projects";
+import Projects from "@/pages/projects/project/Projects";
+import SprintBoard from "@/pages/projects/sprints/SprintBoard";
+import TaskDashboardOverview from "@/pages/projects/tasks/TaskDashboardOverview";
+import TaskBoard from "@/pages/projects/tasks/Taskboard";
+import TeamLogs from "@/pages/projects/teams/TeamLogs";
+import TeamMembersBoard from "@/pages/projects/teams/TeamMembersBoard";
+import MyTaskLogHour from "@/pages/projects/tasks/MyTaskLogHour";
+import ProjectInfo from "@/pages/projects/project/ProjectInfo";
+import ReleaseBoard from "@/pages/projects/release/ReleaseBoard";
+import Timesheet from "@/pages/projects/time-management/Timesheet";
 
 export const projectRoutes = [
   {
-    path: "project",
+    path: "projects",
     element: <Projects />,
     roles: ["admin", "manager"],
   },
   {
-    path: "project/:id/*",
+    path: "projects/:id/*",
     element: <ProjectTabs />,
     roles: ["admin", "manager"],
     children: [
       {
         path: "dashboard",
-        element: <h1>Task Dashboard</h1>,
+        element: <TaskDashboardOverview />,
         roles: ["admin", "manager"],
       },
       {
         path: "team-logs",
-        element: <h1>Team Logs</h1>,
+        element: <TeamLogs />,
         roles: ["admin", "manager"],
       },
       {
         path: "tasks",
-        element: <h1>Task Board</h1>,
+        element: <TaskBoard />,
         roles: ["admin", "manager"],
       },
       {
         path: "my-log-hours",
-        element: <h1>My Task Log Hours</h1>,
+        element: <MyTaskLogHour />,
         roles: ["admin", "manager"],
       },
       {
         path: "details",
-        element: <h1>Project Info</h1>,
+        element: <ProjectInfo />,
         roles: ["admin", "manager"],
       },
       {
         path: "timesheet",
-        element: <h1>Timesheet</h1>,
+        element: <Timesheet />,
         roles: ["admin", "manager"],
       },
       {
@@ -49,17 +58,17 @@ export const projectRoutes = [
       },
       {
         path: "team",
-        element: <h1>Team Members</h1>,
+        element: <TeamMembersBoard />,
         roles: ["admin", "manager"],
       },
       {
         path: "planning",
-        element: <h1>Sprint Board</h1>,
+        element: <SprintBoard />,
         roles: ["admin", "manager"],
       },
       {
         path: "releases",
-        element: <h1>Release Board</h1>,
+        element: <ReleaseBoard />,
         roles: ["admin", "manager"],
       },
     ],

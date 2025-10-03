@@ -18,18 +18,18 @@ export function ProtectedRoute() {
   const currentRoute = findRouteByPath(appRoutes, location.pathname);
 
   //  If route exists but role is not allowed
-  if (
-    currentRoute?.roles &&
-    !user.roles?.some((role) => currentRoute.roles.includes(role))
-  ) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <h1 className="text-2xl font-bold text-red-600">
-          🚫 You do not have access for this route
-        </h1>
-      </div>
-    );
-  }
+  // if (
+  //   currentRoute?.roles &&
+  //   !user.roles?.some((role) => currentRoute.roles.includes(role))
+  // ) {
+  //   return (
+  //     <div className="flex justify-center items-center h-screen">
+  //       <h1 className="text-2xl font-bold text-red-600">
+  //         🚫 You do not have access for this route
+  //       </h1>
+  //     </div>
+  //   );
+  // }
   //  Otherwise allow
   return <Outlet />;
 }

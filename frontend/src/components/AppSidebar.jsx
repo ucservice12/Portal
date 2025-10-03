@@ -30,7 +30,7 @@ function getSectionTitle(module) {
 export function AppSidebar(props) {
   const { user } = useAuth();
 
-  const currentUserRole = user?.roles || "employee";
+  const currentUserRole = user?.roles || ["employee"];
   const sidebarRoutes = getRoutesForRoles(currentUserRole);
   const groupedRoutes = groupRoutesByModule(sidebarRoutes);
 

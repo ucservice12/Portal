@@ -1,9 +1,9 @@
-import React from 'react';
+import MyTaskLogHour from "@/pages/projects/tasks/MyTaskLogHour";
 
 export default function LogHours() {
   return (
-    <div className='p-4'>
-      <h1>LogHours Page</h1>
-    </div>
+    <>
+      <MyTaskLogHour />
+    </>
   );
 }

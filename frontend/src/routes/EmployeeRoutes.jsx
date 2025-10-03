@@ -9,9 +9,12 @@ import GoalsList from "@/pages/employee/goals/GoalsList";
 import Achievement from "@/pages/employee/goals/Achievement";
 import GoalsDashboard from "@/pages/employee/goals/GoalsDashboard";
 
+// attendace
 import Attendance from "@/pages/employee/attendance/Attendance";
 
-import Tasks from "@/pages/employee/Tasks";
+// tasks
+import TaskBoard from "@/pages/projects/tasks/TaskBoard";
+
 import LogHours from "@/pages/employee/LogHours";
 import Dashboard from "@/pages/dashboard/Dashboard";
 import Profile from "@/pages/employee/setting/Profile";
@@ -30,7 +33,7 @@ export const employeeRoutes = [
   },
   {
     path: "employee/tasks/*",
-    element: <Tasks />,
+    element: <TaskBoard />,
     roles: ["employee", "hr", "admin"],
   },
   {

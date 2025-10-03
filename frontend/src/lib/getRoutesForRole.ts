@@ -31,7 +31,7 @@ export function getRoutesForRoles(roles: string[]): Route[] {
 
   MODULE_ORDER.forEach((module) => {
     // Check if any role has access to this module
-    const hasAccess = roles.some((role) =>
+    const hasAccess = roles?.some((role) =>
       (roleAccess[role] || []).includes(module)
     );
     if (!hasAccess) return;

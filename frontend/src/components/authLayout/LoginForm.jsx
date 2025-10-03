@@ -5,10 +5,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
-import { login as loginApi } from "@/api/auth";
+import { login as loginApi, getMe } from "@/api/auth";
 
 export function LoginForm() {
-  const { setStep, loading, saveAuth } = useAuth();
+  const { setStep, loading, saveAuth, setUser } = useAuth();
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState({
     email: "",
@@ -61,6 +61,11 @@ export function LoginForm() {
 
       // Save token + user to localStorage
       saveAuth(token, userData);
+
+      if (token) {
+        const res = await getMe();
+        setUser(res.data.data);
+      }
 
       setErrors({ email: "", password: "", general: "" });
     } catch (err) {

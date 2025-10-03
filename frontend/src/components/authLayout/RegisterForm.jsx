@@ -214,9 +214,7 @@ export function RegisterForm() {
           />
           <Label htmlFor="terms">Accept terms and conditions</Label>
         </div>
-        {errors.terms && (
-          <p className="text-red-500 text-sm">{errors.terms}</p>
-        )}
+        {errors.terms && <p className="text-red-500 text-sm">{errors.terms}</p>}
 
         {/* General Error */}
         {errors.general && (
