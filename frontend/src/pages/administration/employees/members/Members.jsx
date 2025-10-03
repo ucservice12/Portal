@@ -313,7 +313,7 @@ export default function Member() {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <Link to={`/admin/myteam/selected-member/${emp.name}`}>
+                  <Link to={`/admin/myteam/selected-member/:id/dashbaord`}>
                     <DropdownMenuItem className="flex items-center gap-2">
                       <Eye className="w-4 h-4" /> View
                     </DropdownMenuItem>
