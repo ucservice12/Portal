@@ -5,17 +5,49 @@ import {
   ContactSalesTabs,
   MyThingsSalesTabs,
 } from "@/components/custom/tabs/Tabs";
-import SalesBoard from "@/pages/sales/SalesBoard";
-import Contacts from "@/pages/sales/Contacts";
-import MyThings from "@/pages/sales/MyThings";
-import CurrentSales from "@/pages/sales/CurrentSales";
-import FutureSales from "@/pages/sales/FutureSales";
-import SalesSettings from "@/pages/sales/SalesSettings";
+
+import SalesDashboard from "@/pages/sales/board/SalesDashboard";
+
+import ContactList from "@/pages/sales/contacts/contacts-list/ContactList";
+import Tags from "@/pages/sales/contacts/tags/Tags";
+import Companies from "@/pages/sales/contacts/companies/Companies";
+import Maps from "@/pages/sales/contacts/maps/Maps";
+import Tasks from "@/pages/sales/my-things/tasks/Tasks";
+import MeetingSlotes from "@/pages/sales/my-things/meeting-slots/MeetingSlotes";
+
+// current sales
+import CurrentSalesPayment from "@/pages/sales/current-sales/CurrentSalesPayment";
+import { CurrentSalesStatements } from "@/pages/sales/current-sales/CurrentSalesStatements";
+import CurrentSalesInvoices from "@/pages/sales/current-sales/invoice/CurrentSalesInvoices";
+import { CreateInvoice } from "@/pages/sales/current-sales/invoice/CreateInvoice";
+import { EditInvoice } from "@/pages/sales/current-sales/invoice/EditInvoice";
+import InvoiceDetails from "@/pages/sales/current-sales/invoice/Invoicedetails";
+import { CurrentSalesCustomers } from "@/pages/sales/current-sales/CurrentSalesCustomers";
+
+// future sales
+import Deals from "@/pages/sales/future-sales/deals/Deals";
+import { FutureSalesEstimate } from "@/pages/sales/future-sales/estimate/FutureSalesEstimate";
+import Proposals from "@/pages/sales/future-sales/proposal/Proposals";
+import ProposalDocument from "@/pages/sales/future-sales/proposal/ProposalDocument";
+import { CreateEstimate } from "@/pages/sales/future-sales/estimate/CreateEstimate";
+import Estimatesdetails from "@/pages/sales/future-sales/estimate/Estimatesdetails";
+import { EditEstimate } from "@/pages/sales/future-sales/estimate/EditEstimate";
+import ProductService from "../pages/sales/sales-settings/products/ProductService";
+import Taxes from "../pages/sales/sales-settings/taxes/Taxes";
+import ChooseCurrency from "../pages/sales/sales-settings/ChooseCurrency";
+import Customers from "../pages/sales/sales-settings/customers/Customers";
+import Footer from "../pages/sales/sales-settings/footer/Footer";
+import NotesAndTerms from "../pages/sales/sales-settings/notes-terms/NotesAndTerms";
+import Industries from "../pages/sales/sales-settings/industries/Industries";
+import VerifyEmails from "../pages/sales/sales-settings/verify-emails/VerifyEmails";
+import MeetingLinks from "../pages/sales/sales-settings/metting-links/MeetingLinks";
+
+// sales-settings
 
 export const salesRoutes = [
   {
     path: "sales-board",
-    element: <SalesBoard />,
+    element: <SalesDashboard />,
     roles: ["sales", "hr", "admin"],
   },
   {
@@ -23,14 +55,18 @@ export const salesRoutes = [
     element: <ContactSalesTabs />,
     roles: ["sales", "hr", "admin"],
     children: [
-      { index: true, element: <Contacts />, roles: ["sales", "hr", "admin"] },
-      { path: "tags", element: <h1>Tags</h1>, roles: ["sales", "hr", "admin"] },
       {
-        path: "companies",
-        element: <h1>Companies</h1>,
+        index: true,
+        element: <ContactList />,
         roles: ["sales", "hr", "admin"],
       },
-      { path: "maps", element: <h1>Maps</h1>, roles: ["sales", "hr", "admin"] },
+      { path: "tags", element: <Tags />, roles: ["sales", "hr", "admin"] },
+      {
+        path: "companies",
+        element: <Companies />,
+        roles: ["sales", "hr", "admin"],
+      },
+      { path: "maps", element: <Maps />, roles: ["sales", "hr", "admin"] },
     ],
   },
   {
@@ -38,20 +74,20 @@ export const salesRoutes = [
     element: <MyThingsSalesTabs />,
     roles: ["sales", "hr", "admin"],
     children: [
-      { index: true, element: <MyThings />, roles: ["sales", "hr", "admin"] },
+      { index: true, element: <Tasks />, roles: ["sales", "hr", "admin"] },
       {
         path: "deals",
-        element: <h1>Deals</h1>,
+        element: <Deals />,
         roles: ["sales", "hr", "admin"],
       },
       {
         path: "freeslots",
-        element: <h1>Meeting Slots</h1>,
+        element: <MeetingSlotes />,
         roles: ["sales", "hr", "admin"],
       },
       {
         path: "customers",
-        element: <h1>Customers</h1>,
+        element: <CurrentSalesCustomers />,
         roles: ["sales", "hr", "admin"],
       },
     ],
@@ -63,37 +99,37 @@ export const salesRoutes = [
     children: [
       {
         index: true,
-        element: <CurrentSales />,
+        element: <CurrentSalesPayment />,
         roles: ["sales", "hr", "admin"],
       },
       {
         path: "statements",
-        element: <h1>Statements</h1>,
+        element: <CurrentSalesStatements />,
         roles: ["sales", "hr", "admin"],
       },
       {
         path: "customers",
-        element: <h1>Customers</h1>,
+        element: <CurrentSalesCustomers />,
         roles: ["sales", "hr", "admin"],
       },
       {
         path: "invoices",
-        element: <h1>Invoices</h1>,
+        element: <CurrentSalesInvoices />,
         roles: ["sales", "hr", "admin"],
       },
       {
         path: "invoices/create",
-        element: <h1>Create Invoice</h1>,
+        element: <CreateInvoice />,
         roles: ["sales", "hr", "admin"],
       },
       {
         path: "invoices/update/:id",
-        element: <h1>Edit Invoice</h1>,
+        element: <EditInvoice />,
         roles: ["sales", "hr", "admin"],
       },
       {
         path: "invoices/details/:id",
-        element: <h1>Invoice Details</h1>,
+        element: <InvoiceDetails />,
         roles: ["sales", "hr", "admin"],
       },
     ],
@@ -105,37 +141,37 @@ export const salesRoutes = [
     children: [
       {
         index: true,
-        element: <FutureSales />,
+        element: <FutureSalesEstimate />,
         roles: ["sales", "hr", "admin"],
       },
       {
         path: "deals",
-        element: <h1>Deals</h1>,
+        element: <Deals />,
         roles: ["sales", "hr", "admin"],
       },
       {
         path: "proposals",
-        element: <h1>Proposals</h1>,
+        element: <Proposals />,
         roles: ["sales", "hr", "admin"],
       },
       {
         path: "proposals/create/:id",
-        element: <h1>Proposal Document</h1>,
+        element: <ProposalDocument />,
         roles: ["sales", "hr", "admin"],
       },
       {
         path: "estimates/create",
-        element: <h1>Create Estimate</h1>,
+        element: <CreateEstimate />,
         roles: ["sales", "hr", "admin"],
       },
       {
         path: "estimates/update/:id",
-        element: <h1>Edit Estimate</h1>,
+        element: <EditEstimate />,
         roles: ["sales", "hr", "admin"],
       },
       {
         path: "estimates/details/:id",
-        element: <h1>Estimate Details</h1>,
+        element: <Estimatesdetails />,
         roles: ["sales", "hr", "admin"],
       },
     ],
@@ -147,47 +183,47 @@ export const salesRoutes = [
     children: [
       {
         index: true,
-        element: <SalesSettings />,
+        element: <ProductService />,
         roles: ["sales", "hr", "admin"],
       },
       {
         path: "taxes",
-        element: <h1>Taxes</h1>,
+        element: <Taxes />,
         roles: ["sales", "hr", "admin"],
       },
       {
         path: "customers",
-        element: <h1>Customers</h1>,
+        element: <Customers />,
         roles: ["sales", "hr", "admin"],
       },
       {
         path: "choose-currency",
-        element: <h1>Choose Currency</h1>,
+        element: <ChooseCurrency />,
         roles: ["sales", "hr", "admin"],
       },
       {
         path: "footer",
-        element: <h1>Footer</h1>,
+        element: <Footer />,
         roles: ["sales", "hr", "admin"],
       },
       {
         path: "notes-and-terms",
-        element: <h1>Notes & Terms</h1>,
+        element: <NotesAndTerms />,
         roles: ["sales", "hr", "admin"],
       },
       {
         path: "industries",
-        element: <h1>Industries</h1>,
+        element: <Industries />,
         roles: ["sales", "hr", "admin"],
       },
       {
         path: "verify-emails",
-        element: <h1>Verify Emails</h1>,
+        element: <VerifyEmails />,
         roles: ["sales", "hr", "admin"],
       },
       {
         path: "meeting-links",
-        element: <h1>Meeting Links</h1>,
+        element: <MeetingLinks />,
         roles: ["sales", "hr", "admin"],
       },
     ],

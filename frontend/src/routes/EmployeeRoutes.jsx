@@ -15,8 +15,14 @@ import Attendance from "@/pages/employee/attendance/Attendance";
 // tasks
 import TaskBoard from "@/pages/projects/tasks/TaskBoard";
 
+// leaves management
+import LeaveOverview from "@/pages/employee/leave-mngt/LeaveOverview";
+import LeavesCoff from "@/pages/employee/leave-mngt/LeavesCoff";
+
 import LogHours from "@/pages/employee/LogHours";
 import Dashboard from "@/pages/dashboard/Dashboard";
+
+// settings
 import Profile from "@/pages/employee/setting/Profile";
 import Inventory from "@/pages/employee/setting/Inventory";
 import Holiday from "@/pages/employee/setting/Holiday";
@@ -80,12 +86,12 @@ export const employeeRoutes = [
     children: [
       {
         path: "leaves",
-        element: <h1>Leaves Overview</h1>,
+        element: <LeaveOverview />,
         roles: ["employee", "hr", "admin"],
       },
       {
         path: "c-offs",
-        element: <h1>C-Off Leaves</h1>,
+        element: <LeavesCoff />,
         roles: ["employee", "hr", "admin"],
       },
     ],
